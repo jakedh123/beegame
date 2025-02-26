@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bee Flight - Flower Collection Game</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background: linear-gradient(to bottom, #87CEEB, #E0F7FA);
+            font-family: 'Arial Rounded MT Bold', 'Arial', sans-serif;
+            touch-action: none;
+        }
+        
+        #game-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        #bee {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cellipse cx='50' cy='50' rx='25' ry='35' fill='%23FFD700'/%3E%3Cellipse cx='50' cy='50' rx='20' ry='30' fill='black'/%3E%3Cellipse cx='50' cy='30' rx='22' ry='18' fill='%23FFD700'/%3E%3Cellipse cx='50' cy='70' rx='22' ry='18' fill='%23FFD700'/%3E%3Cellipse cx='75' cy='45' rx='15' ry='10' fill='rgba(255,255,255,0.5)'/%3E%3Cellipse cx='30' cy='45' rx='5' ry='5' fill='white'/%3E%3Cellipse cx='70' cy='45' rx='5' ry='5' fill='white'/%3E%3Ccircle cx='30' cy='45' r='2' fill='black'/%3E%3Ccircle cx='70' cy='45' r='2' fill='black'/%3E%3C/svg%3E");
+            background-size: contain;
+            background-repeat: no-repeat;
+            z-index: 10;
+            transition: transform 0.2s;
+            transform-origin: center;
+        }
+        
+        .flower {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            z-index: 5;
+        }
+        
+        .flower.red {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='20' fill='%23FFEB3B'/%3E%3Ccircle cx='30' cy='30' r='15' fill='%23FF5252'/%3E%3Ccircle cx='70' cy='30' r='15' fill='%23FF5252'/%3E%3Ccircle cx='30' cy='70' r='15' fill='%23FF5252'/%3E%3Ccircle cx='70' cy='70' r='15' fill='%23FF5252'/%3E%3Ccircle cx='20' cy='50' r='15' fill='%23FF5252'/%3E%3Ccircle cx='80' cy='50' r='15' fill='%23FF5252'/%3E%3Ccircle cx='50' cy='20' r='15' fill='%23FF5252'/%3E%3Ccircle cx='50' cy='80' r='15' fill='%23FF5252'/%3E%3Crect x='48' y='85' width='4' height='40' fill='%234CAF50'/%3E%3C/svg%3E");
+        }
+        
+        .flower.blue {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='20' fill='%23FFEB3B'/%3E%3Ccircle cx='30' cy='30' r='15' fill='%232196F3'/%3E%3Ccircle cx='70' cy='30' r='15' fill='%232196F3'/%3E%3Ccircle cx='30' cy='70' r='15' fill='%232196F3'/%3E%3Ccircle cx='70' cy='70' r='15' fill='%232196F3'/%3E%3Ccircle cx='20' cy='50' r='15' fill='%232196F3'/%3E%3Ccircle cx='80' cy='50' r='15' fill='%232196F3'/%3E%3Ccircle cx='50' cy='20' r='15' fill='%232196F3'/%3E%3Ccircle cx='50' cy='80' r='15' fill='%232196F3'/%3E%3Crect x='48' y='85' width='4' height='40' fill='%234CAF50'/%3E%3C/svg%3E");
+        }
+        
+        .flower.purple {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='20' fill='%23FFEB3B'/%3E%3Ccircle cx='30' cy='30' r='15' fill='%239C27B0'/%3E%3Ccircle cx='70' cy='30' r='15' fill='%239C27B0'/%3E%3Ccircle cx='30' cy='70' r='15' fill='%239C27B0'/%3E%3Ccircle cx='70' cy='70' r='15' fill='%239C27B0'/%3E%3Ccircle cx='20' cy='50' r='15' fill='%239C27B0'/%3E%3Ccircle cx='80' cy='50' r='15' fill='%239C27B0'/%3E%3Ccircle cx='50' cy='20' r='15' fill='%239C27B0'/%3E%3Ccircle cx='50' cy='80' r='15' fill='%239C27B0'/%3E%3Crect x='48' y='85' width='4' height='40' fill='%234CAF50'/%3E%3C/svg%3E");
+        }
+        
+        .cloud {
+            position: absolute;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 50'%3E%3Cpath d='M10,30 Q15,20 30,25 Q35,10 50,15 Q65,5 75,20 Q90,15 90,30 Q95,40 85,45 Q75,50 65,45 Q55,55 40,50 Q25,55 15,45 Q5,45 10,30 Z' fill='white'/%3E%3C/svg%3E");
+            background-size: contain;
+            background-repeat: no-repeat;
+            opacity: 0.8;
+            z-index: 1;
+        }
+        
+        #score-container {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background-color: rgba(255, 255, 255, 0.7);
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            z-index: 20;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        #timer-container {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: rgba(255, 255, 255, 0.7);
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            z-index: 20;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        #start-screen, #end-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 30;
+        }
+        
+        .screen-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 80%;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+        
+        h1 {
+            color: #F57C00;
+            font-size: 36px;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        h2 {
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        p {
+            color: #666;
+            font-size: 18px;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+        
+        button {
+            background-color: #F57C00;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 20px;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        button:hover {
+            background-color: #FF9800;
+            transform: scale(1.05);
+        }
+        
+        #high-score {
+            font-weight: bold;
+            color: #F57C00;
+        }
+        
+        .honey-drop {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M50,10 Q70,40 70,70 Q70,90 50,90 Q30,90 30,70 Q30,40 50,10 Z' fill='%23FFD700'/%3E%3C/svg%3E");
+            background-size: contain;
+            background-repeat: no-repeat;
+            z-index: 15;
+            opacity: 0;
+            animation: dropHoney 1s forwards;
+        }
+        
+        @keyframes dropHoney {
+            0% {
+                transform: translateY(-10px);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(40px);
+                opacity: 0;
+            }
+        }
+        
+        .score-animation {
+            position: absolute;
+            color: #F57C00;
+            font-weight: bold;
+            font-size: 24px;
+            z-index: 25;
+            animation: floatUp 1.5s forwards;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        }
+        
+        @keyframes floatUp {
+            0% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+        }
+        
+        .collision-animation {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='40' fill='none' stroke='%23FFD700' stroke-width='8'/%3E%3Ccircle cx='50' cy='50' r='30' fill='none' stroke='%23FFD700' stroke-width='6'/%3E%3Ccircle cx='50' cy='50' r='20' fill='none' stroke='%23FFD700' stroke-width='4'/%3E%3C/svg%3E");
+            background-size: contain;
+            background-repeat: no-repeat;
+            z-index: 20;
+            animation: expand 0.6s forwards;
+        }
+        
+        @keyframes expand {
+            0% {
+                transform: scale(0.3);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1.5);
+                opacity: 0;
+            }
+        }
+        
+        #bonus-message {
+            position: absolute;
+            top: 70px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(255, 193, 7, 0.9);
+            color: #333;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 20px;
+            font-weight: bold;
+            opacity: 0;
+            z-index: 25;
+            transition: opacity 0.3s;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        @media (max-width: 600px) {
+            #score-container, #timer-container {
+                font-size: 18px;
+                padding: 8px 16px;
+            }
+            
+            h1 {
+                font-size: 28px;
+            }
+            
+            h2 {
+                font-size: 22px;
+            }
+            
+            p {
+                font-size: 16px;
+            }
+            
+            button {
+                padding: 12px 24px;
+                font-size: 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <div id="bee"></div>
+        <div id="score-container">Score: <span id="score">0</span></div>
+        <div id="timer-container">Time: <span id="timer">30</span>s</div>
+        <div id="bonus-message"></div>
+        
+        <div id="start-screen">
+            <div class="screen-content">
+                <h1>Bee Flight 🐝</h1>
+                <p>Help the bee collect nectar from flowers before time runs out!</p>
+                <p><strong>Instructions:</strong> Click or tap where you want the bee to fly.</p>
+                <p>You have 30 seconds to collect as many flowers as possible.</p>
+                <button id="start-button">Start Game</button>
+            </div>
+        </div>
+        
+        <div id="end-screen" style="display: none;">
+            <div class="screen-content">
+                <h1>Game Over!</h1>
+                <h2>Your Score: <span id="final-score">0</span></h2>
+                <p>High Score: <span id="high-score">0</span></p>
+                <p>Come back tomorrow to beat your high score!</p>
+                <button id="play-again-button">Play Again</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Game elements
+            const gameContainer = document.getElementById('game-container');
+            const bee = document.getElementById('bee');
+            const scoreElement = document.getElementById('score');
+            const timerElement = document.getElementById('timer');
+            const startScreen = document.getElementById('start-screen');
+            const endScreen = document.getElementById('end-screen');
+            const startButton = document.getElementById('start-button');
+            const playAgainButton = document.getElementById('play-again-button');
+            const finalScoreElement = document.getElementById('final-score');
+            const highScoreElement = document.getElementById('high-score');
+            const bonusMessage = document.getElementById('bonus-message');
+            
+            // Game state variables
+            let score = 0;
+            let timeLeft = 30;
+            let gameActive = false;
+            let flowerSpawnInterval;
+            let gameInterval;
+            let flowers = [];
+            let clouds = [];
+            let combo = 0;
+            let lastFlowerCollected = 0;
+            
+            // Flower colors
+            const flowerColors = ['red', 'blue', 'purple'];
+            
+            // Get high score from local storage
+            let highScore = localStorage.getItem('beeFlightHighScore') || 0;
+            highScoreElement.textContent = highScore;
+            
+            // Initialize bee position
+            function initializeBee() {
+                const gameRect = gameContainer.getBoundingClientRect();
+                bee.style.left = (gameRect.width / 2 - 30) + 'px';
+                bee.style.top = (gameRect.height / 2 - 30) + 'px';
+            }
+            
+            // Spawn clouds
+            function spawnClouds() {
+                const gameRect = gameContainer.getBoundingClientRect();
+                
+                for (let i = 0; i < 5; i++) {
+                    const cloud = document.createElement('div');
+                    cloud.className = 'cloud';
+                    
+                    const cloudWidth = Math.random() * 150 + 100;
+                    const cloudHeight = cloudWidth / 2;
+                    
+                    cloud.style.width = cloudWidth + 'px';
+                    cloud.style.height = cloudHeight + 'px';
+                    
+                    const left = Math.random() * (gameRect.width - cloudWidth);
+                    const top = Math.random() * (gameRect.height / 3);
+                    
+                    cloud.style.left = left + 'px';
+                    cloud.style.top = top + 'px';
+                    
+                    // Random movement speed
+                    const speed = Math.random() * 0.5 + 0.1;
+                    cloud.dataset.speed = speed;
+                    
+                    gameContainer.appendChild(cloud);
+                    clouds.push(cloud);
+                }
+            }
+            
+            // Move clouds
+            function moveClouds() {
+                const gameRect = gameContainer.getBoundingClientRect();
+                
+                clouds.forEach(cloud => {
+                    const speed = parseFloat(cloud.dataset.speed);
+                    const cloudRect = cloud.getBoundingClientRect();
+                    let left = parseFloat(cloud.style.left);
+                    
+                    left -= speed;
+                    
+                    if (left + cloudRect.width < 0) {
+                        left = gameRect.width;
+                    }
+                    
+                    cloud.style.left = left + 'px';
+                });
+            }
+            
+            // Spawn a new flower
+            function spawnFlower() {
+                if (!gameActive) return;
+                
+                const gameRect = gameContainer.getBoundingClientRect();
+                const flower = document.createElement('div');
+                
+                // Random flower color
+                const colorIndex = Math.floor(Math.random() * flowerColors.length);
+                flower.className = 'flower ' + flowerColors[colorIndex];
+                
+                // Random position within viewport
+                const left = Math.random() * (gameRect.width - 40);
+                const top = Math.random() * (gameRect.height - 40);
+                
+                flower.style.left = left + 'px';
+                flower.style.top = top + 'px';
+                
+                // Add to game container
+                gameContainer.appendChild(flower);
+                flowers.push(flower);
+                
+                // Maximum number of flowers on screen at once
+                if (flowers.length > 8) {
+                    const oldestFlower = flowers.shift();
+                    if (oldestFlower && oldestFlower.parentNode) {
+                        oldestFlower.parentNode.removeChild(oldestFlower);
+                    }
+                }
+            }
+            
+            // Variables for drag functionality
+            let isDragging = false;
+            let gravityInterval;
+            let fallSpeed = 2;
+            
+            // Start dragging bee
+            function startDragging(event) {
+                if (!gameActive) return;
+                
+                event.preventDefault();
+                
+                const beeRect = bee.getBoundingClientRect();
+                const clickX = event.clientX || (event.touches && event.touches[0].clientX);
+                const clickY = event.clientY || (event.touches && event.touches[0].clientY);
+                
+                // Check if click/touch is on the bee
+                if (
+                    clickX >= beeRect.left &&
+                    clickX <= beeRect.right &&
+                    clickY >= beeRect.top &&
+                    clickY <= beeRect.bottom
+                ) {
+                    isDragging = true;
+                    clearInterval(gravityInterval);
+                    
+                    // Add move events
+                    document.addEventListener('mousemove', dragBee);
+                    document.addEventListener('touchmove', dragBee, { passive: false });
+                }
+            }
+            
+            // Stop dragging bee
+            function stopDragging() {
+                if (!gameActive) return;
+                
+                if (isDragging) {
+                    isDragging = false;
+                    
+                    // Remove move events
+                    document.removeEventListener('mousemove', dragBee);
+                    document.removeEventListener('touchmove', dragBee);
+                    
+                    // Start gravity
+                    startGravity();
+                }
+            }
+            
+            // Drag bee to new position
+            function dragBee(event) {
+                if (!gameActive || !isDragging) return;
+                
+                event.preventDefault();
+                
+                const gameRect = gameContainer.getBoundingClientRect();
+                const beeRect = bee.getBoundingClientRect();
+                
+                // Get mouse/touch position
+                let targetX, targetY;
+                
+                if (event.touches) { // Mobile touch
+                    targetX = event.touches[0].clientX - gameRect.left;
+                    targetY = event.touches[0].clientY - gameRect.top;
+                } else { // Mouse move
+                    targetX = event.clientX - gameRect.left;
+                    targetY = event.clientY - gameRect.top;
+                }
+                
+                // Calculate center position of bee
+                const beeX = targetX - beeRect.width / 2;
+                const beeY = targetY - beeRect.height / 2;
+                
+                // Keep bee within boundaries
+                const boundedX = Math.max(0, Math.min(gameRect.width - beeRect.width, beeX));
+                const boundedY = Math.max(0, Math.min(gameRect.height - beeRect.height, beeY));
+                
+                // Calculate angle for rotation
+                const currentX = parseFloat(bee.style.left) + beeRect.width / 2;
+                const currentY = parseFloat(bee.style.top) + beeRect.height / 2;
+                
+                const angle = Math.atan2(targetY - currentY, targetX - currentX) * 180 / Math.PI;
+                
+                // Apply rotation
+                bee.style.transform = `rotate(${angle}deg)`;
+                
+                // Move bee
+                bee.style.left = boundedX + 'px';
+                bee.style.top = boundedY + 'px';
+                
+                // Check for collisions with flowers
+                checkCollisions();
+            }
+            
+            // Apply gravity to bee
+            function startGravity() {
+                if (!gameActive) return;
+                
+                gravityInterval = setInterval(() => {
+                    const gameRect = gameContainer.getBoundingClientRect();
+                    const beeRect = bee.getBoundingClientRect();
+                    
+                    // Current position
+                    let currentTop = parseFloat(bee.style.top);
+                    
+                    // Apply gravity
+                    currentTop += fallSpeed;
+                    
+                    // Check for game over (bottom of screen)
+                    if (currentTop + beeRect.height >= gameRect.height) {
+                        clearInterval(gravityInterval);
+                        endGame();
+                        return;
+                    }
+                    
+                    // Update bee position
+                    bee.style.top = currentTop + 'px';
+                    
+                    // Change bee angle to point down
+                    bee.style.transform = 'rotate(90deg)';
+                    
+                    // Check for collisions with flowers
+                    checkCollisions();
+                }, 30);
+            }
+            
+            // Check for collisions between bee and flowers
+            function checkCollisions() {
+                const beeRect = bee.getBoundingClientRect();
+                
+                flowers.forEach((flower, index) => {
+                    const flowerRect = flower.getBoundingClientRect();
+                    
+                    // Simple collision detection
+                    if (!(
+                        beeRect.right < flowerRect.left ||
+                        beeRect.left > flowerRect.right ||
+                        beeRect.bottom < flowerRect.top ||
+                        beeRect.top > flowerRect.bottom
+                    )) {
+                        // Collision detected
+                        collectFlower(flower, index, flowerRect);
+                    }
+                });
+            }
+            
+            // Collect flower and update score
+            function collectFlower(flower, index, flowerRect) {
+                // Remove flower from game
+                flowers.splice(index, 1);
+                
+                // Animate flower collection
+                createCollisionAnimation(flowerRect);
+                createHoneyDrop(flowerRect);
+                
+                // Calculate score based on combo
+                const now = Date.now();
+                if (now - lastFlowerCollected < 3000) {
+                    combo++;
+                } else {
+                    combo = 1;
+                }
+                lastFlowerCollected = now;
+                
+                // Base points plus combo bonus
+                let points = 10;
+                let comboBonus = 0;
+                
+                if (combo > 1) {
+                    comboBonus = combo * 5;
+                    points += comboBonus;
+                    
+                    // Show combo message
+                    bonusMessage.textContent = `${combo}x Combo! +${comboBonus}`;
+                    bonusMessage.style.opacity = '1';
+                    
+                    setTimeout(() => {
+                        bonusMessage.style.opacity = '0';
+                    }, 1500);
+                }
+                
+                // Update score
+                score += points;
+                scoreElement.textContent = score;
+                
+                // Show score animation
+                createScoreAnimation(flowerRect, points);
+                
+                // Remove flower from DOM
+                if (flower && flower.parentNode) {
+                    flower.parentNode.removeChild(flower);
+                }
+            }
+            
+            // Create collision animation
+            function createCollisionAnimation(flowerRect) {
+                const animation = document.createElement('div');
+                animation.className = 'collision-animation';
+                animation.style.left = (flowerRect.left + flowerRect.width / 2 - 25) + 'px';
+                animation.style.top = (flowerRect.top + flowerRect.height / 2 - 25) + 'px';
+                
+                gameContainer.appendChild(animation);
+                
+                // Remove animation after it's done
+                setTimeout(() => {
+                    if (animation.parentNode) {
+                        animation.parentNode.removeChild(animation);
+                    }
+                }, 600);
+            }
+            
+            // Create honey drop animation
+            function createHoneyDrop(flowerRect) {
+                const honey = document.createElement('div');
+                honey.className = 'honey-drop';
+                honey.style.left = (flowerRect.left + flowerRect.width / 2 - 10) + 'px';
+                honey.style.top = (flowerRect.top + flowerRect.height / 2 - 10) + 'px';
+                
+                gameContainer.appendChild(honey);
+                
+                // Remove honey after animation
+                setTimeout(() => {
+                    if (honey.parentNode) {
+                        honey.parentNode.removeChild(honey);
+                    }
+                }, 1000);
+            }
+            
+            // Create score animation
+            function createScoreAnimation(flowerRect, points) {
+                const scoreAnim = document.createElement('div');
+                scoreAnim.className = 'score-animation';
+                scoreAnim.textContent = '+' + points;
+                scoreAnim.style.left = (flowerRect.left + flowerRect.width / 2 - 20) + 'px';
+                scoreAnim.style.top = (flowerRect.top - 20) + 'px';
+                
+                gameContainer.appendChild(scoreAnim);
+                
+                // Remove animation after it's done
+                setTimeout(() => {
+                    if (scoreAnim.parentNode) {
+                        scoreAnim.parentNode.removeChild(scoreAnim);
+                    }
+                }, 1500);
+            }
+            
+            // Start game
+            function startGame() {
+                // Reset game state
+                score = 0;
+                timeLeft = 30;
+                combo = 0;
+                lastFlowerCollected = 0;
+                isDragging = false;
+                
+                // Update UI
+                scoreElement.textContent = score;
+                timerElement.textContent = timeLeft;
+                
+                // Hide start screen, show game
+                startScreen.style.display = 'none';
+                endScreen.style.display = 'none';
+                
+                // Clear any existing flowers
+                flowers.forEach(flower => {
+                    if (flower.parentNode) {
+                        flower.parentNode.removeChild(flower);
+                    }
+                });
+                flowers = [];
+                
+                // Clear any existing intervals
+                clearInterval(gravityInterval);
+                clearInterval(flowerSpawnInterval);
+                clearInterval(gameInterval);
+                
+                // Initialize bee
+                initializeBee();
+                
+                // Set game as active
+                gameActive = true;
+                
+                // Start gravity immediately
+                startGravity();
+                
+                // Start spawning flowers
+                spawnFlower();
+                flowerSpawnInterval = setInterval(spawnFlower, 1500);
+                
+                // Start game loop
+                gameInterval = setInterval(() => {
+                    timeLeft--;
+                    timerElement.textContent = timeLeft;
+                    
+                    // Move clouds
+                    moveClouds();
+                    
+                    // Game over when time runs out
+                    if (timeLeft <= 0) {
+                        endGame();
+                    }
+                }, 1000);
+            }
+            
+            // End game
+            function endGame() {
+                // Stop all intervals
+                clearInterval(flowerSpawnInterval);
+                clearInterval(gameInterval);
+                clearInterval(gravityInterval);
+                
+                // Set game as inactive
+                gameActive = false;
+                isDragging = false;
+                
+                // Remove event listeners to prevent issues
+                document.removeEventListener('mousemove', dragBee);
+                document.removeEventListener('touchmove', dragBee);
+                
+                // Update high score if needed
+                if (score > highScore) {
+                    highScore = score;
+                    localStorage.setItem('beeFlightHighScore', highScore);
+                    highScoreElement.textContent = highScore;
+                }
+                
+                // Update final score
+                finalScoreElement.textContent = score;
+                
+                // Show end screen
+                endScreen.style.display = 'flex';
+            }
+            
+            // Event listeners
+            startButton.addEventListener('click', startGame);
+            playAgainButton.addEventListener('click', startGame);
+            
+            // Mouse/touch events for bee movement
+            gameContainer.addEventListener('mousedown', startDragging);
+            gameContainer.addEventListener('touchstart', startDragging, { passive: false });
+            document.addEventListener('mouseup', stopDragging);
+            document.addEventListener('touchend', stopDragging);
+            
+            // Initialize the game visuals
+            initializeBee();
+            spawnClouds();
+            
+            // Modify start instructions
+            document.querySelector('#start-screen p:nth-child(2)').textContent = 'Click and hold on the bee to keep it flying! If you let go, the bee will fall!';
+            document.querySelector('#start-screen p:nth-child(3)').innerHTML = '<strong>Instructions:</strong> Click and hold on the bee to move it. Don\'t let it fall to the bottom!';
+            
+            // Add hover effect to bee
+            bee.style.cursor = 'grab';
+            
+            // Prevent scrolling on mobile when touching the game
+            gameContainer.addEventListener('touchmove', (e) => {
+                if (gameActive) {
+                    e.preventDefault();
+                }
+            }, { passive: false });
+        });
+    </script>
+</body>
+</html>
